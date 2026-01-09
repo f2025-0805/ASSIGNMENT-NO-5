@@ -1,0 +1,95 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <string>
+using namespace std;
+
+struct Employee {
+    int id;
+    string name;
+    double monthlySalary;
+};
+
+int main() {
+    vector<Employee> employees;
+    int numEmployees;
+    
+    cout << "Enter number of employees: ";
+    cin >> numEmployees;
+    
+    cin.ignore();
+    
+    for(int i = 0; i < numEmployees; i++) {
+        Employee emp;
+        
+        cout << "\nEmployee " << i+1 << ":" << endl;
+        
+        cout << "Enter ID: ";
+        cin >> emp.id;
+        cin.ignore();
+        
+        cout << "Enter Name: ";
+        getline(cin, emp.name);
+        
+        cout << "Enter Monthly Salary: $";
+        cin >> emp.monthlySalary;
+        
+        employees.push_back(emp);
+    }
+    
+    double threshold;
+    cout << "\nEnter salary threshold (minimum yearly salary to save to file): $";
+    cin >> threshold;
+    
+    ofstream outFile("high_salary.txt");
+    
+    if(!outFile.is_open()) {
+        cout << "Error: Could not create file!" << endl;
+        return 1;
+    }
+    
+    cout << "\nSaving employees with yearly salary > $" << threshold << " to file..." << endl;
+    
+    int countSaved = 0;
+    for(int i = 0; i < employees.size(); i++) {
+        double yearlySalary = employees[i].monthlySalary * 12;
+        
+        if(yearlySalary > threshold) {
+            outFile << "ID: " << employees[i].id << endl;
+            outFile << "Name: " << employees[i].name << endl;
+            outFile << "Monthly Salary: $" << employees[i].monthlySalary << endl;
+            outFile << "Yearly Salary: $" << yearlySalary << endl;
+            outFile << "---------------------" << endl;
+            countSaved++;
+        }
+    }
+    
+    outFile.close();
+    cout << "Saved " << countSaved << " employees to high_salary.txt" << endl;
+    
+    cout << "\nReading from high_salary.txt:" << endl;
+    cout << "===============================" << endl;
+    
+    ifstream inFile("high_salary.txt");
+    
+    if(!inFile.is_open()) {
+        cout << "Error: Could not open file for reading!" << endl;
+        return 1;
+    }
+    
+    string line;
+    bool fileIsEmpty = true;
+    
+    while(getline(inFile, line)) {
+        cout << line << endl;
+        fileIsEmpty = false;
+    }
+    
+    if(fileIsEmpty) {
+        cout << "No employees found with salary above threshold." << endl;
+    }
+    
+    inFile.close();
+    
+    return 0;
+}
